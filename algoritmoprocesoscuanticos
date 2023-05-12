@@ -1,0 +1,33 @@
+import numpy as np
+from qiskit import QuantumCircuit, Aer, execute
+
+# Definimos los parámetros del algoritmo
+n = 3    # número de qubits en el registro
+shots = 1000   # número de veces que se ejecuta el circuito
+
+# Creamos el circuito cuántico
+qc = QuantumCircuit(n, n)
+
+# Inicializamos el registro en un estado superpuesto uniforme
+qc.h(range(n))
+
+# Preparamos el registro con los números cuánticos
+qc.rz(np.pi/4, 0)
+qc.ry(np.pi/2, 1)
+qc.rx(np.pi/4, 2)
+
+# Medimos cada qubit del registro
+qc.measure(range(n), range(n))
+
+# Ejecutamos el circuito en un simulador cuántico
+backend = Aer.get_backend('qasm_simulator')
+job = execute(qc, backend, shots=shots)
+result = job.result()
+
+# Procesamos los resultados para calcular la media
+counts = result.get_counts(qc)
+total = sum([int(k, 2) for k in counts.keys()])
+mean = total / (shots * n)
+
+# Imprimimos el resultado
+print("La media de los números cuánticos es:", mean)
